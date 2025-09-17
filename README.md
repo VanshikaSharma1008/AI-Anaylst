@@ -72,6 +72,10 @@ Upload your dataset → Explore tabs for analysis → Get insights, charts, and 
 - `requirements.txt`: Dependencies
 - `README.md`: You're here!
 
+## UML Class Diagram
+
+Here's a simple UML class diagram illustrating the main classes and their relationships in DataAnalyst Pro:\n\n```mermaid\nclassDiagram\n    class App {\n        +run()\n    }\n    class DataProcessor {\n        +process_data(df: DataFrame) : DataFrame\n    }\n    class StatisticalAnalyzer {\n        +get_numerical_statistics(df: DataFrame) : DataFrame\n        +calculate_correlation_matrix(df: DataFrame) : DataFrame\n        +identify_outliers(df: DataFrame, column: str) : Series\n    }\n    class Visualizer {\n        +create_distribution_plot(df: DataFrame, column: str) : Figure\n        +create_scatter_matrix(df: DataFrame) : Figure\n        +create_correlation_heatmap(corr_matrix: DataFrame) : Figure\n    }\n    class ReportGenerator {\n        +generate_pdf_report(df: DataFrame, analysis_results: dict) : str\n    }\n    class ErrorHandler {\n        +validate_file(file_path: str) : bool\n        +validate_dataframe(df: DataFrame) : bool\n        +handle_error(e: Exception) : str\n    }\n    App --> DataProcessor : uses\n    App --> StatisticalAnalyzer : uses\n    App --> Visualizer : uses\n    App --> ReportGenerator : uses\n    App --> ErrorHandler : uses\n```
+
 ## Contributing
 
 Fork the repo and submit a PR with your enhancements to help evolve DataAnalyst Pro!
