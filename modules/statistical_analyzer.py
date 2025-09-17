@@ -30,12 +30,13 @@ class StatisticalAnalyzer:
         # Calculate statistics
         stats = numeric_df.describe().T
         
-        # Add additional statistics
-        stats['median'] = numeric_df.median()
-        stats['skew'] = numeric_df.skew()
-        stats['kurtosis'] = numeric_df.kurtosis()
-        stats['missing'] = numeric_df.isna().sum()
-        stats['missing_pct'] = (numeric_df.isna().sum() / len(df) * 100).round(2)
+        # Add additional statistics using loop to avoid Series assignment issues
+        for col in numeric_df.columns:
+            stats.loc[col, 'median'] = numeric_df[col].median()
+            stats.loc[col, 'skew'] = numeric_df[col].skew()
+            stats.loc[col, 'kurtosis'] = numeric_df[col].kurtosis()
+            stats.loc[col, 'missing'] = numeric_df[col].isna().sum()
+            stats.loc[col, 'missing_pct'] = (numeric_df[col].isna().sum() / len(df) * 100).round(2)
         
         # Round values for better display
         stats = stats.round(2)
@@ -70,7 +71,7 @@ class StatisticalAnalyzer:
             results.loc[col, 'unique_values'] = len(value_counts)
             
             if not value_counts.empty:
-                results.loc[col, 'top_value'] = value_counts.index[0]
+                results.loc[col, 'top_value'] = str(value_counts.index[0]) if not value_counts.empty else np.nan
                 results.loc[col, 'top_count'] = value_counts.iloc[0]
                 results.loc[col, 'top_percentage'] = (value_counts.iloc[0] / len(df) * 100).round(2)
             
@@ -78,7 +79,7 @@ class StatisticalAnalyzer:
             results.loc[col, 'missing_pct'] = (categorical_df[col].isna().sum() / len(df) * 100).round(2)
             
             # Store value counts as dictionary for later use
-            results.loc[col, 'value_counts'] = value_counts.head(10).to_dict()
+            results.loc[col, 'value_counts'] = {str(k): v for k, v in value_counts.head(10).items()}
         
         return results
     
@@ -136,3 +137,33 @@ class StatisticalAnalyzer:
         
         else:
             raise ValueError("Method must be 'iqr' or 'zscore'")
+    
+    def analyze(self, df):
+        """
+        Perform comprehensive statistical analysis on the DataFrame.
+        
+        Args:
+            df (pandas.DataFrame): The input DataFrame
+            
+        Returns:
+            dict: Dictionary containing various statistical analyses
+        """
+        numerical_stats = self.get_numerical_statistics(df)
+        categorical_stats = self.get_categorical_statistics(df)
+        correlation_matrix = self.calculate_correlation_matrix(df)
+        
+        # Calculate outliers for each numerical column
+        outliers = {}
+        numeric_columns = df.select_dtypes(include=['number']).columns
+        for col in numeric_columns:
+            outliers[col] = {
+                'count': self.identify_outliers(df, col).sum(),
+                'indices': df[self.identify_outliers(df, col)].index.tolist()
+            }
+        
+        return {
+            'numerical_stats': numerical_stats,
+            'categorical_stats': categorical_stats,
+            'correlation_matrix': correlation_matrix,
+            'outliers': outliers
+        }
