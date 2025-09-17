@@ -1,0 +1,25 @@
+# Python .gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Logs
+logs/
+
+# Reports (if you don't want to commit generated reports)
+reports/
+
+# Uploads (if temporary)
+uploads/
+
+# Distribution / packaging
+.dist/
+dist/
+*.egg-info/
